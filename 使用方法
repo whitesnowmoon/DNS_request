@@ -1,2 +1,4 @@
 1.首先要是window,支持winsock
 2.看maincpp.cpp,就三个方法
+3.类里面有imformation的属性叫module来着是pubilc的
+4.欢迎讨论
