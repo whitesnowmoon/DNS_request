@@ -1,0 +1,2 @@
+1.首先要是window,支持winsock
+2.看maincpp.cpp,就三个方法
