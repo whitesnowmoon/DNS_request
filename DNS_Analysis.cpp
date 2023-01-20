@@ -63,7 +63,7 @@ std::vector<DNS_Request_Protocol::DNSResponedAnswerModule> DNS_Analysis::GetAnsw
 	pos+=package_size;
 	for (size_t i = 0; i < num; i++)
 	{
-		module.nameBuff_ = GetName(pos, recvBuff);
+		GetName(pos, recvBuff, module.nameBuff_);
 		poscopy(pos, (char*)&module.type_, Len);
 		module.type_ = ntohs(module.type_);
 		module.TTL_ = ntohl(module.TTL_);
@@ -71,7 +71,7 @@ std::vector<DNS_Request_Protocol::DNSResponedAnswerModule> DNS_Analysis::GetAnsw
 		module.class_ = ntohs(module.class_);
 		pos += Len;
 		if (module.DataLength_ != 4) {
-			module.Data_ = GetName(pos,recvBuff);
+			 GetName(pos,recvBuff, module.Data_);
 		}
 		else
 		{
@@ -125,7 +125,7 @@ inline std::string DNS_Analysis::regularName(std::string& oldname) {
 	return newName;
 }
 
-inline bool DNS_Analysis::is_zip(std::string::iterator& pos, std::string& recvBuff, unsigned char& c) {
+inline bool DNS_Analysis::is_zip(std::string::iterator& pos, std::string& recvBuff, unsigned char& c, std::string& name) {
 	if (((*pos) & 0b11000000) == 0b11000000) {
 		unsigned short offset;
 		auto newpos = recvBuff.begin();
@@ -135,6 +135,7 @@ inline bool DNS_Analysis::is_zip(std::string::iterator& pos, std::string& recvBu
 		newpos += offset;
 		pos = newpos;
 		c = *pos;
+
 		return true;
 	}
 	return false;
@@ -147,14 +148,19 @@ inline void DNS_Analysis::poscopy(std::string::iterator pos, char* position,int 
 	}
 }
 
-std::string DNS_Analysis::GetName(std::string::iterator& pos, std::string& recvBuff) {
-	std::string name; std::string::iterator oldpos = pos;bool rt=false;
+bool DNS_Analysis::GetName(std::string::iterator& pos, std::string& recvBuff, std::string& name) {
 	unsigned char c = *pos;
 
-	while (c!=0)
+	while (c != 0)
 	{
-		if(!rt)
-			rt = is_zip(pos, recvBuff, c);
+		if (((*pos) & 0b11000000) == 0b11000000) {
+			std::string::iterator oldpos = pos;
+			is_zip(pos, recvBuff, c, name);
+			GetName(pos, recvBuff, name);
+			pos = oldpos;
+			pos += 2;
+			return false;
+		}
 		pos++;
 		for (size_t i = 0; i < c; i++)
 		{
@@ -166,11 +172,7 @@ std::string DNS_Analysis::GetName(std::string::iterator& pos, std::string& recvB
 	}
 	name.pop_back();
 	pos++;
-	if (rt) {
-		pos = oldpos;
-		pos += 2;
-	}
-	return name;
+	return true;
 }
 
 

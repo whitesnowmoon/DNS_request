@@ -3,7 +3,7 @@
 int main() {
 
 	DNS_Analysis dns("8.8.8.8");
-	dns.DNS_Request("www.pixiv.com");
+	dns.DNS_Request("www.pivix.net");
 	dns.printimformation();
 	return 0;
 }

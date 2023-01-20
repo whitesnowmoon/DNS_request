@@ -88,9 +88,9 @@ private:
 	std::vector<DNS_Request_Protocol::DNSResponedAnswerModule> GetAnswerModule(std::string& recvBuff, int num);
 	inline bool is_cutdown(DNS_Request_Protocol::DNSRequestHeader header);
 	inline std::string regularName(std::string& oldname);
-	inline bool is_zip(std::string::iterator& pos, std::string& recvBuff,unsigned char& c);
+	inline bool is_zip(std::string::iterator& pos, std::string& recvBuff,unsigned char& c, std::string& name);
 	inline void poscopy(std::string::iterator pos, char* position,int Len);
-	std::string GetName(std::string::iterator& pos, std::string& recvBuff);
+	bool GetName(std::string::iterator& pos, std::string& recvBuff, std::string& name);
 	DNS_Analysis() = default;
 	bool valid;
 	WSADATA wsaData;
